@@ -3,21 +3,15 @@ import './App.css';
 import {SearchBar} from '../SearchBar/SearchBar'
 import { SearchResults } from '../SearchResults/SearchResults';
 import { Playlist } from '../Playlist/Playlist';
+import Spotify from '../../util/Spotify';
 
 class App extends React.Component {
   constructor(props){
     super(props)
     this.state = {
-      searchResults: [
-        {'name': 'Tiny Dancer', 'artist': 'Elton John', 'album': 'Madman Across The Water', 'id': '001'},
-        {'name': 'Tiny Dancer', 'artist': 'Tim McGraw', 'album': 'Love Story', 'id': '002'},
-        {'name': 'Tiny Dancer', 'artist': 'The White Raven', 'album': 'Tiny Dancer', 'id': '003'}
-      ],
+      searchResults: [],
       playListName: 'My Jamssss',
-      playListTracks: [
-        {'name': 'Tiny Dancer', 'artist': 'Elton John', 'album': 'Madman Across The Water', 'id': '001'},
-        {'name': 'Tiny Dancer', 'artist': 'Tim McGraw', 'album': 'Love Story', 'id': '002'},
-      ],
+      playListTracks: [],
     }
     this.addTrack = this.addTrack.bind(this)
     this.removeTrack = this.removeTrack.bind(this)
@@ -49,11 +43,14 @@ class App extends React.Component {
     const trackURI = this.state.playListTracks.map(track => {
       return `spotify:track:${track.id}`
     })
+    // console.log(trackURI)
     return trackURI
   }
 
-  search (term) {
-    console.log(term)
+  async search (term) {
+    const searchTracks = await Spotify.search(term)
+    // console.log(searchTracks)
+    this.setState({searchResults: searchTracks})
   }
 
   render () {
