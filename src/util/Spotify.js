@@ -22,8 +22,7 @@ const Spotify = {
         },
 
         search: async function (term) {
-                this.getAccessToken()
-                await fetch(`https://api.spotify.com/v1/search?type=track&q=${term}`,{headers:{Authorization: `Bearer ${accessToken[1]}`}})
+                await fetch(`https://api.spotify.com/v1/search?type=track&q=${term}`,{headers:{'Authorization': `Bearer ${accessToken}`}})
                         .then(response => {return response.json()})
                         .then(jsonResponse => {
                                 // console.log(jsonResponse)
@@ -38,6 +37,42 @@ const Spotify = {
                         })
                 // console.log(searchTracks)
                 return searchTracks
+        },
+
+        savePlaylist: async function (playListName, trackURI) {
+                let userID = ''
+                let playlistID = ''
+                if ((!playListName) && (!trackURI)){
+                        return
+                }
+                await fetch(`https://api.spotify.com/v1/me`,{headers: {'Authorization': `Bearer ${accessToken[1]}`}})
+                        .then(response => {return response.json()})
+                        .then(jsonResponse => {userID = jsonResponse.id})
+                
+                console.log(userID)
+
+                await fetch(`https://api.spotify.com/v1/users/${userID}/playlists`,{
+                        method: 'POST',
+                        headers: {
+                                'Authorization': `Bearer ${accessToken[1]}`,
+                                'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({'name': `${playListName}`})
+                })
+                        .then(response => {return response.json()})
+                        .then(jsonResponse => playlistID = jsonResponse.id)
+                
+                console.log(playlistID)
+                console.log(trackURI)
+                await fetch (`https://api.spotify.com/v1/users/${userID}/playlists/${playlistID}/tracks`,{
+                        method: 'POST',
+                        headers: {
+                                'Authorization': `Bearer ${accessToken[1]}`,
+                                'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({'uris': trackURI})
+                }
+                )
         }
 
 }
